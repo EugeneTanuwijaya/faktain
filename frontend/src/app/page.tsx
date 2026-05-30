@@ -30,6 +30,16 @@ export default function HomePage() {
           axiosErr.response?.data?.detail ||
             "Terjadi kesalahan saat menganalisis. Silakan coba lagi."
         );
+      } else if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code?: string }).code === "ECONNABORTED"
+      ) {
+        setError(
+          "Analisis memakan waktu terlalu lama (timeout). Server mungkin sedang " +
+            "menunggu kuota AI atau memverifikasi sumber. Silakan coba lagi."
+        );
       } else {
         setError("Tidak dapat terhubung ke server. Pastikan backend berjalan.");
       }

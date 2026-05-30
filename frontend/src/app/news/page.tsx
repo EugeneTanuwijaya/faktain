@@ -45,6 +45,15 @@ export default function NewsPage() {
         setError(
           axiosErr.response?.data?.detail || "Gagal menganalisis artikel."
         );
+      } else if (
+        err &&
+        typeof err === "object" &&
+        "code" in err &&
+        (err as { code?: string }).code === "ECONNABORTED"
+      ) {
+        setError(
+          "Analisis memakan waktu terlalu lama (timeout). Silakan coba lagi."
+        );
       } else {
         setError("Tidak dapat terhubung ke server.");
       }

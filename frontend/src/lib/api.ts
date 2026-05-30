@@ -5,7 +5,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 60000, // 60s timeout for AI analysis
+  timeout: 120000, // 120s: AI analysis with grounding + possible rate-limit retry
 });
 
 export async function analyzeText(text: string): Promise<AnalysisResult> {
