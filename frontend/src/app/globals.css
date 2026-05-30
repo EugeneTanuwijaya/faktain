@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+:root {
+  --color-paper: #f4f4f0;
+  --color-ink: #1a1a1a;
+  --color-meta: #555555;
+  --color-rule: #111111;
+  --color-rule-light: #d1d1d1;
+  --color-accent-red: #8b0000;
+  --color-accent-green: #1a5c1a;
+  --color-accent-yellow: #8b6914;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  line-height: 1.6;
+}
+
+/* Newspaper Rules (dividers) */
+.rule-top {
+  border-top: 2px solid var(--color-rule);
+}
+
+.rule-bottom {
+  border-bottom: 1px solid var(--color-rule-light);
+}
+
+.rule-left {
+  border-left: 1px solid var(--color-rule-light);
+}
+
+.rule-right {
+  border-right: 1px solid var(--color-rule-light);
+}
+
+.rule-double {
+  border-top: 2px solid var(--color-rule);
+  border-bottom: 1px solid var(--color-rule);
+  padding: 4px 0;
+}
+
+/* Drop Cap */
+.drop-cap::first-letter {
+  float: left;
+  font-family: 'Playfair Display', serif;
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 0.8;
+  margin-right: 8px;
+  margin-top: 4px;
+  color: var(--color-ink);
+}
+
+/* Headline styles */
+.headline {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* Meta text (byline, date, labels) */
+.meta-text {
+  font-family: 'Inter', 'Helvetica Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-meta);
+}
+
+/* Verdict badges */
+.badge-kredibel {
+  background-color: var(--color-accent-green);
+  color: #ffffff;
+}
+
+.badge-perlu-dicek {
+  background-color: var(--color-accent-yellow);
+  color: #ffffff;
+}
+
+.badge-hoaks {
+  background-color: var(--color-accent-red);
+  color: #ffffff;
+}
+
+/* Loading skeleton */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e8e8e4 25%, #d8d8d4 50%, #e8e8e4 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-paper);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-rule-light);
+}

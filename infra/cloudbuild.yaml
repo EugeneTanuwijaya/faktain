@@ -1,0 +1,59 @@
+steps:
+  # --- Backend ---
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - build
+      - -t
+      - asia-southeast1-docker.pkg.dev/$PROJECT_ID/hoax-detector/backend:$COMMIT_SHA
+      - ./backend
+    id: "build-backend"
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - push
+      - asia-southeast1-docker.pkg.dev/$PROJECT_ID/hoax-detector/backend:$COMMIT_SHA
+    id: "push-backend"
+    waitFor: ["build-backend"]
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - hoax-detector-backend
+      - --image=asia-southeast1-docker.pkg.dev/$PROJECT_ID/hoax-detector/backend:$COMMIT_SHA
+      - --region=asia-southeast1
+      - --allow-unauthenticated
+    id: "deploy-backend"
+    waitFor: ["push-backend"]
+
+  # --- Frontend ---
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - build
+      - -t
+      - asia-southeast1-docker.pkg.dev/$PROJECT_ID/hoax-detector/frontend:$COMMIT_SHA
+      - ./frontend
+    id: "build-frontend"
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - push
+      - asia-southeast1-docker.pkg.dev/$PROJECT_ID/hoax-detector/frontend:$COMMIT_SHA
+    id: "push-frontend"
+    waitFor: ["build-frontend"]
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - hoax-detector-frontend
+      - --image=asia-southeast1-docker.pkg.dev/$PROJECT_ID/hoax-detector/frontend:$COMMIT_SHA
+      - --region=asia-southeast1
+      - --allow-unauthenticated
+    id: "deploy-frontend"
+    waitFor: ["push-frontend"]
+
+options:
+  logging: CLOUD_LOGGING_ONLY
