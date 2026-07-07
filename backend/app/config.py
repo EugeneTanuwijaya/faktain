@@ -30,7 +30,10 @@ class Settings:
     # LLM provider: OpenRouter (OpenAI-compatible Chat Completions API).
     LLM_API_KEY: str = os.getenv("LLM_API_KEY", "").strip()
     LLM_BASE_URL: str = os.getenv("LLM_BASE_URL", "https://openrouter.ai/api/v1").strip()
-    LLM_MODEL: str = os.getenv("LLM_MODEL", "meta-llama/llama-3.3-70b-instruct:free").strip()
+    # Paid but very cheap (~Rp 52/analysis) and fast (~5-10s). Free models are
+    # a shared pool that regularly 429s under load, so they only serve as the
+    # last fallback, not the default.
+    LLM_MODEL: str = os.getenv("LLM_MODEL", "openai/gpt-5-mini").strip()
     # Cap output tokens to keep responses bounded and avoid credit-reservation
     # 402 errors on providers that reserve (prompt + max_tokens) up front.
     LLM_MAX_TOKENS: int = int(os.getenv("LLM_MAX_TOKENS", "2048"))
@@ -58,7 +61,7 @@ class Settings:
         m.strip()
         for m in os.getenv(
             "LLM_FALLBACK_MODELS",
-            "openai/gpt-oss-120b:free,qwen/qwen3-next-80b-a3b-instruct:free",
+            "google/gemini-2.5-flash-lite,meta-llama/llama-3.3-70b-instruct:free",
         ).split(",")
         if m.strip()
     ]
