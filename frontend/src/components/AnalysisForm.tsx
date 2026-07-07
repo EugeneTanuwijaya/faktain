@@ -39,6 +39,7 @@ export default function AnalysisForm({ onSubmit, isLoading }: AnalysisFormProps)
   return (
     <form onSubmit={handleSubmit} className="mb-8">
       <div className="rule-bottom pb-4 mb-4">
+        <p className="kicker mb-2">Masukkan Berita</p>
         <h2
           className="headline text-2xl md:text-3xl mb-3"
           style={{ fontFamily: "'Playfair Display', serif" }}

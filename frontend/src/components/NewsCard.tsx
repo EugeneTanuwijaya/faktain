@@ -18,14 +18,14 @@ export default function NewsCard({ article, onAnalyze, isAnalyzing }: NewsCardPr
         className="no-underline"
       >
         <h3
-          className="headline text-lg mb-1 hover:underline cursor-pointer"
+          className="headline text-xl mb-1 hover:underline cursor-pointer"
           style={{ fontFamily: "'Playfair Display', serif", lineHeight: "1.2" }}
         >
           {article.title}
         </h3>
       </a>
       <div className="flex items-center gap-2 mb-2">
-        <span className="meta-text" style={{ fontSize: "10px" }}>
+        <span className="kicker" style={{ fontSize: "10px" }}>
           {article.source}
         </span>
         {article.published && (
@@ -45,9 +45,9 @@ export default function NewsCard({ article, onAnalyze, isAnalyzing }: NewsCardPr
       <button
         onClick={() => onAnalyze(article.id)}
         disabled={isAnalyzing}
-        className="meta-text text-[10px] px-3 py-1 border border-[var(--color-rule-light)] bg-transparent cursor-pointer hover:bg-[var(--color-ink)] hover:text-white transition-colors disabled:opacity-50"
+        className="pill disabled:opacity-50"
       >
-        {isAnalyzing ? "MENGANALISIS..." : "CEK FAKTA →"}
+        {isAnalyzing ? "Meringkas..." : "Ringkas AI →"}
       </button>
     </article>
   );

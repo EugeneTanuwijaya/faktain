@@ -10,14 +10,20 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# CORS
+# CORS — allow both the old-format and new-format Cloud Run URLs.
+# FRONTEND_URL may be comma-separated to allow multiple origins.
+_origins = [
+    origin.strip()
+    for origin in settings.FRONTEND_URL.split(",")
+    if origin.strip()
+] + [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        settings.FRONTEND_URL,
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ],
+    allow_origins=_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

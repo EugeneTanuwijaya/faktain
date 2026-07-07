@@ -12,6 +12,13 @@ class VerifiedClaim(BaseModel):
     claim: str = Field(..., description="Klaim yang diekstrak dari teks")
     status: str = Field(..., description="TERKONFIRMASI | DIBANTAH | TIDAK DAPAT DIVERIFIKASI")
     explanation: str = Field(..., description="Penjelasan hasil verifikasi")
+    is_core: bool = Field(
+        True,
+        description=(
+            "True jika klaim ini benar-benar dinyatakan user (inti). False jika "
+            "klaim pendukung/konteks tambahan dari hasil pencarian."
+        ),
+    )
 
 
 class Source(BaseModel):
@@ -44,6 +51,14 @@ class NewsItem(BaseModel):
 class NewsFeedResponse(BaseModel):
     articles: List[NewsItem]
     last_updated: str
+
+
+class NewsSummaryResponse(BaseModel):
+    id: str = Field(..., description="ID berita")
+    title: str = Field(..., description="Judul berita")
+    source: str = Field("", description="Sumber/media berita")
+    original_url: str = Field(..., description="URL artikel asli (hasil decode)")
+    summary: str = Field(..., description="Ringkasan AI dari isi artikel")
 
 
 class ErrorResponse(BaseModel):

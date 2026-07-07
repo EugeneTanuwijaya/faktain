@@ -8,6 +8,7 @@ export interface VerifiedClaim {
   claim: string;
   status: "TERKONFIRMASI" | "DIBANTAH" | "TIDAK DAPAT DIVERIFIKASI";
   explanation: string;
+  is_core?: boolean;
 }
 
 export interface Source {
@@ -40,4 +41,12 @@ export interface NewsItem {
 export interface NewsFeedResponse {
   articles: NewsItem[];
   last_updated: string;
+}
+
+export interface NewsSummary {
+  id: string;
+  title: string;
+  source: string;
+  original_url: string;
+  summary: string;
 }

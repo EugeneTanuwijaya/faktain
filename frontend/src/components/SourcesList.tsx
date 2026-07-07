@@ -15,7 +15,7 @@ export default function SourcesList({ sources, claims }: SourcesListProps) {
       case "DIBANTAH":
         return { color: "var(--color-accent-red)", label: "✗ DIBANTAH" };
       default:
-        return { color: "var(--color-accent-yellow)", label: "? BELUM TERVERIFIKASI" };
+        return { color: "var(--color-accent-yellow)", label: "? TIDAK DAPAT DIVERIFIKASI" };
     }
   };
 
@@ -44,6 +44,7 @@ export default function SourcesList({ sources, claims }: SourcesListProps) {
           <div className="space-y-3">
             {claims.map((claim, index) => {
               const style = getClaimStatusStyle(claim.status);
+              const isContext = claim.is_core === false;
               return (
                 <div key={index} className="rule-bottom pb-3">
                   <p className="text-[14px] font-bold mb-1">
@@ -55,6 +56,14 @@ export default function SourcesList({ sources, claims }: SourcesListProps) {
                   >
                     {style.label}
                   </span>
+                  {isContext && (
+                    <span
+                      className="meta-text ml-2"
+                      style={{ color: "var(--color-meta)", fontSize: "10px" }}
+                    >
+                      · KONTEKS TAMBAHAN
+                    </span>
+                  )}
                   <p className="text-[13px] text-[var(--color-meta)] mt-1">
                     {claim.explanation}
                   </p>

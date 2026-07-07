@@ -1,5 +1,14 @@
+import asyncio
+
 import httpx
 from newspaper import Article
+
+
+def _parse_html(url: str, html: str) -> str:
+    article = Article(url)
+    article.set_html(html)
+    article.parse()
+    return article.text
 
 
 async def scrape_article(url: str) -> str:
@@ -11,12 +20,8 @@ async def scrape_article(url: str) -> str:
             response.raise_for_status()
             html = response.text
 
-        # Parse with newspaper3k
-        article = Article(url)
-        article.set_html(html)
-        article.parse()
-
-        text = article.text
+        # newspaper3k parsing is CPU-heavy; keep it off the event loop.
+        text = await asyncio.to_thread(_parse_html, url, html)
         if not text or len(text.strip()) < 50:
             raise ValueError("Konten artikel terlalu pendek atau tidak dapat diekstrak")
 
