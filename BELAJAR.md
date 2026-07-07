@@ -2398,3 +2398,66 @@ menerapkan max-instances=1.
 ---
 
 *Bagian sesi audit + perbaikan + cek produksi dibuat 7 Juli 2026 — catatan belajar.*
+
+
+# Tambahan 
+
+- API backend: backend).
+
+Yang perlu dibagikan ke pengguna cukup link frontend yang pertama. Ingat: fitur login Google baru berfungsi setelah 
+berikan link akses publiknya
+
+Link akses publik aplikasi Faktain:
+
+- Aplikasi (frontend): https://hoax-deta.run.app
+- API backend:                                             https://hoax-det.run.app —dokumentasi interaktifnya di https://hoax-detector-backend-qwtbyvmotq-as.a.run.app/docs
+
+Cloud Run juga menyediakan format URL kedua yang menunjuk klayanan yang samtend-237232251242.asia-southeast1.run.app (keduanya sudah diizinkan di CORS backend).                                                  
+Yang perlu dibagikan ke pengguna cukup link frontend yang pertama. Ingat: fitur login Google baru berfungsi setelah  domain frontend  domains diFirebase Console.
+                                                             Baked for 9s
+
+❯ kenapa ada banyak sekali link aksesnya? dan dari mana asal docs nya
+                                                             Dua pertanyaan bsan sederhananya.
+
+Kenapa link-nya banyak?
+
+Sebenarnya cuma ada 2 layanan (frontend dan backend), tapi Cloud Run otomat tiap layanan —jadi terlihat seperti 4 link:
+
+┌─────┬──────────────────────┐Cloud Build.
+                                                 Commit: 1944557  file, seluruh
+
+- Backend revisi baru 00014 dengan FIREBASE_PROJECT_ID=faktain-63ddd (verifikasi tokhidup di produkster kini akurat).
+- Frontend revisi 00002 — pertama kalinya di-updaMei; config Firedle JS
+
+Deployment drift yang kemarin ditemukan sekarang produksi menjalapo, termasuktambalan spoofing XFF.
+                                                 Satu langkah manewat gcloud(checklist O.5 #se Console → Authorized domains dan pastikan hoax-detector-frontend-qwtbyvmotq-as.a.run.app ada di daftar — tanpa itu popup login Google akan ditolak dengan auth/unauthorizeogin di situs
+Faktain:
+
+- Aplikasi (frontend):                                   https://hoax-deta.run.apphoax-detector-frontend-237232251242.asia-southeast1.run.app (keduanya sudah diizinkan di CORS backend).                                                
+gguna cukup link frontend yang pertama. Ingat: fitur login Google baru berfungsi setelah domain frontend itu ditambahkan ke Authorized domains di Firebase Console
+duanya ada penjelasan sederhananya.
+
+Kenapa link-nya banyak?
+
+  │          project)          │
+│  n  │                      │                            │
+├─────┼──────────────────────┼────────────────────────────┤
+│ Fro │ hoax-detfrontend-237 │
+──┴────────────────────────────┘
+
+Keduanya menunjuk ke container yang persis sama — bukan dua
+deployment. qwtbuat Google saatercatat di bagian G BELAJAR.md).
+
+Untuk publikasi, pilih satu saja (yang mana pun) supaya
+konsisten.
+
+
+
+Itu fitur bawaan FastAPI — tidak ada yang menulis halaman itu.
+Saat kamu mendef hint dan
+
+    description="API Pendeteksi Hoaks berbasis AI untuk pengguna Indonesia",
+    version="1.0
+)
+
+Docstring berbah(misalnyaocs ikut publik — siapa pun bisa melihat dan mencoba API dari sana. Untuk aplikasi ini tidak berbahaya (endpoint-nya memang publik dan sudah di-rate-limit), tapi kalau suatu saat mau disembunyikan, cukup FastAPI(docs_url=None, redoc_url=None).

@@ -281,8 +281,11 @@ async def _chat_completion(
                     err = resp.text
                 last_error = f"{resp.status_code}: {err}"
 
+                # Non-429 errors (404 model removed, 400, 5xx) won't heal by
+                # retrying the SAME model — move on to the next fallback
+                # instead of aborting the whole chain.
                 if resp.status_code != 429:
-                    raise ValueError(f"LLM API error {last_error}")
+                    break
 
                 retry_after = resp.headers.get("Retry-After")
                 try:

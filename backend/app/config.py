@@ -51,11 +51,14 @@ class Settings:
     # Retry handling for transient 429 (rate limit) and flaky empty responses
     # from free models. Falls back to alternate models when the primary is
     # rate-limited.
+    # NOTE: OpenRouter retires :free variants without warning (z-ai/glm-4.5-air
+    # died Jul 2026). Check https://openrouter.ai/api/v1/models if analysis
+    # starts failing with 404s.
     LLM_FALLBACK_MODELS: list[str] = [
         m.strip()
         for m in os.getenv(
             "LLM_FALLBACK_MODELS",
-            "openai/gpt-oss-120b:free,z-ai/glm-4.5-air:free",
+            "openai/gpt-oss-120b:free,qwen/qwen3-next-80b-a3b-instruct:free",
         ).split(",")
         if m.strip()
     ]
