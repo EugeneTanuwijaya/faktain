@@ -75,3 +75,8 @@ credentials.json
 /REVISION_PLAN.md
 /docs/9ROUTER_HERMES.md
 /docs/superpowers/
+
+# ===== Local deployment templates and login guide =====
+/.gcloudignore
+/infra/cloudbuild.yaml
+/docs/PANDUAN-FITUR-LOGIN.md

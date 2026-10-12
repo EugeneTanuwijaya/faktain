@@ -45,7 +45,6 @@ Next.js -> FastAPI -> Langflow -> 9Router (model teks/vision)
 backend/       API, validasi, pencarian bukti, dan tes Python
 frontend/      Antarmuka Next.js dan tes browser
 langflow/      Komponen workflow dan ekspor tiga flow
-infra/         Template deployment Cloud Build
 docs/         Panduan Langflow, demo, login, dan catatan validasi
 ```
 
@@ -119,7 +118,7 @@ Buka frontend di `http://localhost:3000`, API docs di `http://localhost:8000/doc
 Cek provider melalui `http://localhost:8000/health/llm`. Pemeriksaan katalog bukan
 jaminan chat/OCR berhasil; uji teks dan gambar setelah konfigurasi.
 
-Untuk login Google, lihat [panduan Firebase](docs/PANDUAN-FITUR-LOGIN.md).
+Untuk login Google, isi konfigurasi Firebase pada template environment frontend/backend.
 Tanpa konfigurasi Firebase, aplikasi tetap berjalan dalam mode tamu.
 
 ## API
@@ -175,9 +174,6 @@ Keduanya bisa berada di server yang sama atau layanan terpisah.
 - Sesuaikan CORS, HTTPS, autentikasi, dan kuota sebelum membuka akses publik.
 - Jalankan backend dengan satu worker: session callback, rate limiter, dan cache
   masih disimpan dalam memori proses. Multiworker tanpa affinity tidak didukung.
-- `infra/cloudbuild.yaml` adalah template lama yang perlu dilengkapi konfigurasi
-  Langflow, URL/model 9Router, dan secret sebelum digunakan untuk revisi ini.
-  Substitusi Firebase sengaja kosong; isi melalui konfigurasi deployment Anda.
 
 Panduan ini tidak menyatakan aplikasi sudah dideploy.
 
@@ -207,4 +203,3 @@ Panduan ini tidak menyatakan aplikasi sudah dideploy.
 - [Skenario demo](docs/LANGFLOW_DEMOS.md)
 - [Komponen dan ekspor flow](langflow/README.md)
 - [Validasi dan batas MVP](docs/MVP_VALIDATION.md)
-- [Login Google/Firebase](docs/PANDUAN-FITUR-LOGIN.md)
