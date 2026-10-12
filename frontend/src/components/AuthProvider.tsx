@@ -34,13 +34,12 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => Boolean(firebaseAuth));
   const [error, setError] = useState<string | null>(null);
   const authConfigured = isAuthConfigured();
 
   useEffect(() => {
     if (!firebaseAuth) {
-      setLoading(false);
       return;
     }
     const unsubscribe = onAuthStateChanged(firebaseAuth, (nextUser) => {

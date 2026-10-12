@@ -1,83 +1,28 @@
 "use client";
 
-import { AnalysisResult } from "@/types";
+import { AnalysisResult, Verdict } from "@/types";
 
-interface VerdictCardProps {
-  result: AnalysisResult;
+const LABELS: Record<Verdict, string> = {
+  SUPPORTED: "Didukung bukti", CONTRADICTED: "Bertentangan dengan bukti", MISLEADING: "Konteks menyesatkan",
+  PARTIALLY_SUPPORTED: "Sebagian didukung", INSUFFICIENT_EVIDENCE: "Bukti belum cukup",
+};
+
+export function VerdictBadge({ verdict }: { verdict: Verdict }) {
+  const style = verdict === "SUPPORTED" ? "badge-kredibel" : ["CONTRADICTED", "MISLEADING"].includes(verdict) ? "badge-hoaks" : "badge-perlu-dicek";
+  return <span className={`meta-text inline-block px-3 py-2 font-bold text-[11px] ${style}`}>
+    {verdict} · {LABELS[verdict]}
+  </span>;
 }
 
-export default function VerdictCard({ result }: VerdictCardProps) {
-  const getBadgeClass = () => {
-    switch (result.verdict) {
-      case "KREDIBEL":
-        return "badge-kredibel";
-      case "PERLU DICEK":
-        return "badge-perlu-dicek";
-      case "KEMUNGKINAN HOAKS":
-        return "badge-hoaks";
-      default:
-        return "";
-    }
-  };
-
-  const getScoreColor = () => {
-    if (result.confidence_score >= 75) return "var(--color-accent-green)";
-    if (result.confidence_score >= 40) return "var(--color-accent-yellow)";
-    return "var(--color-accent-red)";
-  };
-
-  return (
-    <div className="rule-top rule-bottom py-6 mb-6">
-      <p className="kicker mb-3">Hasil Verifikasi</p>
-
-      {/* Verdict Header */}
-      <div className="flex flex-col md:flex-row md:items-center gap-4 mb-2">
-        <span
-          className={`meta-text inline-block px-4 py-2 font-bold text-[13px] ${getBadgeClass()}`}
-        >
-          {result.verdict}
-        </span>
-        <div className="flex items-baseline gap-2">
-          <span
-            className="text-4xl font-bold"
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              color: getScoreColor(),
-            }}
-          >
-            {result.confidence_score}
-          </span>
-          <span className="meta-text">/ 100 Skor Kredibilitas</span>
-        </div>
-      </div>
-
-      {/* Score scale hint */}
-      <p className="meta-text text-[11px] text-[var(--color-meta)] mb-2">
-        Skala: 0 = kemungkinan hoaks &middot; 100 = kredibel
-      </p>
-
-      {/* Semafor-style breakdown */}
-      <div className="mt-4">
-        <div className="semaform-row">
-          <div className="semaform-label">
-            Analisis
-            <span>Reasoning</span>
-          </div>
-          <p className="text-[15px] leading-relaxed">{result.reasoning}</p>
-        </div>
-
-        {result.suggestion && (
-          <div className="semaform-row">
-            <div className="semaform-label">
-              Saran
-              <span>Takeaway</span>
-            </div>
-            <p className="text-[15px] leading-relaxed italic text-[var(--color-meta)]">
-              {result.suggestion}
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+export default function VerdictCard({ result }: { result: AnalysisResult }) {
+  return <section className="rule-top rule-bottom py-6 mb-6" aria-label="Hasil verifikasi">
+    <p className="kicker mb-3">Hasil Verifikasi</p>
+    <VerdictBadge verdict={result.verdict} />
+    <p className="text-[15px] leading-relaxed mt-4">{result.reasoning}</p>
+    {result.suggestion && <p className="text-[14px] text-[var(--color-meta)] mt-3">{result.suggestion}</p>}
+    {!!result.limitations.length && <div className="mt-4 p-4 bg-[var(--color-highlight)]">
+      <h3 className="section-label mb-2">Batasan Pemeriksaan</h3>
+      <ul className="list-disc pl-5 space-y-1">{result.limitations.map((limit, i) => <li className="text-[13px]" key={i}>{limit}</li>)}</ul>
+    </div>}
+  </section>;
 }

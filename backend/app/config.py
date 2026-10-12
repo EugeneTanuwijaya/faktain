@@ -27,45 +27,43 @@ class Settings:
     ANON_RATE_LIMIT: int = int(os.getenv("ANON_RATE_LIMIT", "5"))
     USER_RATE_LIMIT: int = int(os.getenv("USER_RATE_LIMIT", "50"))
 
-    # LLM provider: OpenRouter (OpenAI-compatible Chat Completions API).
+    # OpenAI-compatible provider. Model IDs are local to the configured router.
+    LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "9router").strip().lower()
+    LLM_BASE_URL: str = os.getenv("LLM_BASE_URL", "http://localhost:20128/v1").strip()
     LLM_API_KEY: str = os.getenv("LLM_API_KEY", "").strip()
-    LLM_BASE_URL: str = os.getenv("LLM_BASE_URL", "https://openrouter.ai/api/v1").strip()
-    # Paid but very cheap (~Rp 52/analysis) and fast (~5-10s). Free models are
-    # a shared pool that regularly 429s under load, so they only serve as the
-    # last fallback, not the default.
-    LLM_MODEL: str = os.getenv("LLM_MODEL", "openai/gpt-5-mini").strip()
-    # Cap output tokens to keep responses bounded and avoid credit-reservation
-    # 402 errors on providers that reserve (prompt + max_tokens) up front.
+    LLM_MODEL: str = os.getenv("LLM_MODEL", "").strip()
     LLM_MAX_TOKENS: int = int(os.getenv("LLM_MAX_TOKENS", "2048"))
-
-    # Web search plugin (OpenRouter). The actual search engine (e.g. Firecrawl)
-    # is selected in OpenRouter's dashboard/plugin settings, not here.
-    LLM_WEB_SEARCH: bool = os.getenv("LLM_WEB_SEARCH", "true").lower() in (
-        "1",
-        "true",
-        "yes",
-    )
-    # Max web-search results to request from the plugin per call.
-    LLM_WEB_MAX_RESULTS: int = int(os.getenv("LLM_WEB_MAX_RESULTS", "5"))
-    # Search engine for the web plugin: "firecrawl" (free, needs dashboard
-    # setup), "exa" ($0.005/req), "parallel", "native", or "" (auto).
-    LLM_WEB_ENGINE: str = os.getenv("LLM_WEB_ENGINE", "exa")
-
-    # Retry handling for transient 429 (rate limit) and flaky empty responses
-    # from free models. Falls back to alternate models when the primary is
-    # rate-limited.
-    # NOTE: OpenRouter retires :free variants without warning (z-ai/glm-4.5-air
-    # died Jul 2026). Check https://openrouter.ai/api/v1/models if analysis
-    # starts failing with 404s.
-    LLM_FALLBACK_MODELS: list[str] = [
-        m.strip()
-        for m in os.getenv(
-            "LLM_FALLBACK_MODELS",
-            "google/gemini-2.5-flash-lite,meta-llama/llama-3.3-70b-instruct:free",
-        ).split(",")
-        if m.strip()
-    ]
+    LLM_FALLBACK_MODELS: list[str] = [m.strip() for m in os.getenv("LLM_FALLBACK_MODELS", "").split(",") if m.strip()]
     LLM_MAX_RETRIES: int = int(os.getenv("LLM_MAX_RETRIES", "3"))
+    LLM_HEALTH_TIMEOUT: float = float(os.getenv("LLM_HEALTH_TIMEOUT", "10"))
+
+    # Images never fall back to text models. Explicit list is only used when
+    # the catalog omits vision metadata; operator must verify upstream support.
+    LLM_VISION_MODEL: str = os.getenv("LLM_VISION_MODEL", "").strip()
+    LLM_VISION_MODELS: list[str] = [m.strip() for m in os.getenv("LLM_VISION_MODELS", "").split(",") if m.strip()]
+
+    LLM_WEB_SEARCH: bool = os.getenv("LLM_WEB_SEARCH", "true").lower() in ("1", "true", "yes")
+    LLM_WEB_MAX_RESULTS: int = int(os.getenv("LLM_WEB_MAX_RESULTS", "5"))
+    # Independent search service for 9Router; legacy modes only for OpenRouter.
+    SEARCH_PROVIDER: str = os.getenv("SEARCH_PROVIDER", "duckduckgo").strip().lower()
+    SEARCH_DNS_OVER_HTTPS: bool = os.getenv("SEARCH_DNS_OVER_HTTPS", "false").lower() in ("1", "true", "yes")
+    LLM_WEB_ENGINE: str = os.getenv("LLM_WEB_ENGINE", "exa").strip()
+    LLM_WEB_MODE: str = os.getenv("LLM_WEB_MODE", "external").strip().lower()
+    VERIFICATION_TIMEOUT: float = float(os.getenv("VERIFICATION_TIMEOUT", "100"))
+    VERIFICATION_MAX_CLAIMS: int = 3
+    VERIFICATION_MAX_SOURCES: int = 5
+    VERIFICATION_MAX_SOURCE_IMAGES: int = 2
+    ORCHESTRATION_BACKEND: str = os.getenv("ORCHESTRATION_BACKEND", "langflow").strip().lower()
+    LANGFLOW_URL: str = os.getenv("LANGFLOW_URL", "").strip().rstrip("/")
+    LANGFLOW_FLOW_ID: str = os.getenv("LANGFLOW_FLOW_ID", "").strip()
+    LANGFLOW_API_KEY: str = os.getenv("LANGFLOW_API_KEY", "").strip()
+    LANGFLOW_TEXT_FLOW_ID: str = os.getenv("LANGFLOW_TEXT_FLOW_ID", "").strip()
+    LANGFLOW_IMAGE_FLOW_ID: str = os.getenv("LANGFLOW_IMAGE_FLOW_ID", "").strip()
+    LANGFLOW_SUMMARY_FLOW_ID: str = os.getenv("LANGFLOW_SUMMARY_FLOW_ID", "").strip()
+    LANGFLOW_SERVICE_KEY: str = os.getenv("LANGFLOW_SERVICE_KEY", "").strip()
+    LANGFLOW_NATIVE_FALLBACK: bool = os.getenv("LANGFLOW_NATIVE_FALLBACK", "true").lower() in ("1", "true", "yes")
+    VERIFICATION_MAX_AI_CALLS: int = 8
+    VERIFICATION_MAX_OUTPUT_TOKENS: int = 10000
 
 
 settings = Settings()

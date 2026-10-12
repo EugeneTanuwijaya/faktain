@@ -15,21 +15,20 @@ export default function HomePage() {
             className="lead-headline text-4xl md:text-6xl mb-4"
             style={{ fontFamily: "'Playfair Display', serif" }}
           >
-            Pisahkan Fakta dari Hoaks, dalam Hitungan Detik
+            Terlihat Asli. Apa Faktanya?
           </h2>
           <p className="text-[17px] leading-relaxed justify-text drop-cap mb-4">
-            Di tengah derasnya arus informasi, tak semua yang viral itu benar.
-            Faktain menggunakan kecerdasan buatan untuk menelusuri sumber
-            tepercaya, membandingkan klaim, dan memberi Anda penilaian yang
-            jernih atas sebuah berita. Tempel teks atau tautan, dan biarkan
-            mesin verifikasi bekerja.
+            Tampilan berita dan logo media bisa ditiru. FAKTANYA membantu Anda
+            memeriksa klaim berita dan menelusuri keaslian teks pada gambar.
+            Tempel teks atau tautan, atau unggah screenshot yang Anda ragukan.
+            Telusuri bukti dan konteksnya sebelum membagikan.
           </p>
           <div className="flex flex-wrap gap-3 items-center">
             <Link href="/verifikasi" className="pill no-underline">
-              Mulai Verifikasi →
+              Cek Berita
             </Link>
-            <Link href="/panduan" className="pill no-underline">
-              Pelajari Cara Cek Fakta
+            <Link href="/verifikasi?mode=timpa-teks" className="pill no-underline">
+              Verifikasi Timpa Teks
             </Link>
           </div>
 
@@ -40,10 +39,10 @@ export default function HomePage() {
                 className="headline text-3xl"
                 style={{ fontFamily: "'Playfair Display', serif" }}
               >
-                3
+                5
               </p>
               <p className="meta-text mt-1" style={{ fontSize: "9px" }}>
-                Tingkat Vonis
+                Verdict Berbasis Bukti
               </p>
             </div>
             <div className="py-4 px-4 rule-right">
@@ -51,10 +50,10 @@ export default function HomePage() {
                 className="headline text-3xl"
                 style={{ fontFamily: "'Playfair Display', serif" }}
               >
-                100
+                3
               </p>
               <p className="meta-text mt-1" style={{ fontSize: "9px" }}>
-                Skala Kredibilitas
+                Jenis Input
               </p>
             </div>
             <div className="py-4 pl-4">
@@ -80,6 +79,35 @@ export default function HomePage() {
         </aside>
       </section>
 
+      <section className="mt-10 rule-top rule-bottom py-6" aria-labelledby="timpa-teks-heading">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6">
+          <div>
+            <h2 id="timpa-teks-heading" className="headline text-2xl md:text-3xl mb-3">
+              Verifikasi Timpa Teks
+            </h2>
+            <p className="text-[15px] text-[var(--color-meta)]">
+              Benarkah sumber aslinya menulis demikian?
+            </p>
+          </div>
+          <div>
+            <p className="text-[16px] leading-relaxed mb-3">
+              Timpa teks mengganti tulisan pada screenshot berita, unggahan,
+              atau kutipan sambil mempertahankan tampilannya. Hasilnya bisa
+              berupa lelucon atau satire yang disangka informasi asli ketika
+              konteksnya hilang.
+            </p>
+            <p className="text-[14px] text-[var(--color-meta)] leading-relaxed mb-4">
+              Unggah screenshot untuk membaca teksnya, memeriksa klaim, dan
+              menelusuri sumber pembanding. Timpa teks tidak otomatis berarti
+              hoaks; sumber yang belum ditemukan juga bukan bukti penyuntingan.
+            </p>
+            <Link href="/verifikasi?mode=timpa-teks" className="pill inline-block no-underline">
+              Unggah Screenshot
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ---------------------------------------------------------------- */}
       {/* Semafor-style breakdown: "Apa yang kami nilai"                   */}
       {/* ---------------------------------------------------------------- */}
@@ -98,10 +126,9 @@ export default function HomePage() {
             <span>Verdict</span>
           </div>
           <p className="text-[15px] leading-relaxed">
-            Setiap berita diberi label <strong>Kredibel</strong>,{" "}
-            <strong>Perlu Dicek</strong>, atau{" "}
-            <strong>Kemungkinan Hoaks</strong> — penilaian ringkas yang langsung
-            bisa Anda pahami.
+            Setiap klaim diberi verdict SUPPORTED, CONTRADICTED, MISLEADING,
+            PARTIALLY_SUPPORTED, atau INSUFFICIENT_EVIDENCE sesuai bukti yang
+            tersedia. Periksa evidence per klaim sebelum menyimpulkan.
           </p>
         </div>
         <div className="semaform-row">
@@ -112,6 +139,7 @@ export default function HomePage() {
           <p className="text-[15px] leading-relaxed">
             Sistem menandai pola khas misinformasi: judul provokatif, klaim
             tanpa sumber, manipulasi emosi, hingga kutipan yang dipelintir.
+            Indikator gaya bahasa merupakan petunjuk untuk diperiksa lebih lanjut.
           </p>
         </div>
         <div className="semaform-row">
@@ -151,11 +179,11 @@ export default function HomePage() {
               className="headline text-2xl mb-2 group-hover:underline"
               style={{ fontFamily: "'Playfair Display', serif" }}
             >
-              Verifikasi Berita
+              Cek Berita
             </h4>
             <p className="text-[14px] text-[var(--color-meta)] leading-relaxed">
-              Tempel teks atau URL untuk mendapatkan skor kredibilitas dan
-              analisis mendalam.
+              Tempel teks atau tautan artikel untuk memeriksa klaim, bukti,
+              sumber, dan batasan hasil.
             </p>
           </Link>
           <Link

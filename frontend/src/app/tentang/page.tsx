@@ -2,15 +2,23 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Tentang — Faktain",
+  title: "Tentang — FAKTANYA",
   description:
-    "Mengenal Faktain, platform verifikasi berita Indonesia berbasis kecerdasan buatan.",
+    "Mengenal FAKTANYA, platform verifikasi berita Indonesia berbasis kecerdasan buatan.",
 };
 
 const FAQ = [
   {
+    q: "Apa itu verifikasi timpa teks?",
+    a: "Timpa teks mengganti tulisan pada gambar sambil mempertahankan tampilan berita, unggahan, atau kutipan aslinya. FAKTANYA membaca teks tersebut, memeriksa klaim, dan menelusuri sumber pembanding. Klaim yang salah belum membuktikan teks diedit; sumber yang belum ditemukan juga bukan bukti penyuntingan. Sistem belum memberikan kepastian forensik keaslian screenshot.",
+  },
+  {
+    q: "Apakah timpa teks selalu hoaks?",
+    a: "Tidak. Timpa teks bisa digunakan untuk lelucon, parodi, atau satire. Masalah muncul ketika konteks itu hilang dan hasilnya dianggap informasi asli. Niat satire tidak dapat disimpulkan hanya karena tulisannya terdengar aneh.",
+  },
+  {
     q: "Apakah hasil verifikasi selalu akurat?",
-    a: "Tidak ada sistem yang sempurna. Faktain memberi penilaian berbasis bukti yang ditemukan AI, namun keputusan akhir tetap di tangan Anda. Selalu rujuk silang dengan beberapa sumber tepercaya.",
+    a: "Tidak ada sistem yang sempurna. FAKTANYA memberi penilaian berbasis bukti yang ditemukan AI, namun keputusan akhir tetap di tangan Anda. Selalu rujuk silang dengan beberapa sumber tepercaya.",
   },
   {
     q: "Dari mana sumber beritanya?",
@@ -18,11 +26,11 @@ const FAQ = [
   },
   {
     q: "Apakah layanan ini gratis?",
-    a: "Ya. Faktain dibangun sebagai alat bantu literasi digital untuk publik Indonesia.",
+    a: "Ya. FAKTANYA dibangun sebagai alat bantu literasi digital untuk publik Indonesia.",
   },
   {
     q: "Apakah data saya disimpan?",
-    a: "Teks yang Anda verifikasi diproses untuk analisis dan tidak digunakan untuk tujuan lain.",
+    a: "Teks dan gambar dikirim ke layanan AI untuk analisis. Aplikasi tidak menyimpan unggahan atau riwayat analisis. Kebijakan penyimpanan penyedia AI berlaku untuk pemrosesan eksternal.",
   },
 ];
 
@@ -36,7 +44,7 @@ export default function TentangPage() {
           className="lead-headline text-4xl md:text-5xl"
           style={{ fontFamily: "'Playfair Display', serif" }}
         >
-          Tentang Faktain
+          Tentang FAKTANYA
         </h2>
       </div>
 
@@ -44,7 +52,7 @@ export default function TentangPage() {
         {/* Editorial copy */}
         <div className="md:pr-8 md:rule-right">
           <p className="text-[17px] leading-relaxed justify-text drop-cap mb-4">
-            Faktain lahir dari satu keprihatinan sederhana: misinformasi
+            FAKTANYA lahir dari satu keprihatinan sederhana: misinformasi
             menyebar lebih cepat daripada kebenaran. Setiap hari, kabar bohong
             berpindah dari satu layar ke layar lain, kerap tanpa sempat
             dipertanyakan. Kami percaya teknologi bisa membantu membalik
@@ -52,10 +60,17 @@ export default function TentangPage() {
           </p>
           <p className="text-[16px] leading-relaxed justify-text mb-6">
             Dengan memadukan model kecerdasan buatan dan penelusuran web secara
-            langsung, Faktain membandingkan klaim sebuah berita dengan sumber
+            langsung, FAKTANYA membandingkan klaim sebuah berita dengan sumber
             tepercaya, lalu menyajikannya dalam format yang jernih dan mudah
             dipahami. Tujuannya bukan menggantikan nalar Anda, melainkan
             mempersenjatainya.
+          </p>
+
+          <p className="text-[16px] leading-relaxed mb-6">
+            Selain Cek Berita, FAKTANYA menonjolkan Verifikasi Timpa Teks untuk
+            screenshot berita, unggahan, dan kutipan. Tampilan yang meyakinkan
+            belum membuktikan bahwa sumber aslinya benar menulis demikian.
+            Kami membantu menelusuri klaim, bukti pembanding, dan konteksnya.
           </p>
 
           <div className="rule-top pt-6 mb-6">
@@ -66,7 +81,7 @@ export default function TentangPage() {
               Cara Kerja
             </h3>
             <p className="text-[16px] leading-relaxed justify-text mb-4">
-              Faktain tidak mengandalkan ingatan model AI semata. Sebelum
+              FAKTANYA tidak mengandalkan ingatan model AI semata. Sebelum
               menilai, sistem menelusuri internet terlebih dahulu untuk
               mengumpulkan fakta terbaru, lalu menyuntikkan temuan itu sebagai
               bukti ke dalam analisis. Pendekatan ini dikenal sebagai{" "}
@@ -124,7 +139,7 @@ export default function TentangPage() {
                     Putusan & Sumber
                   </p>
                   <p className="text-[15px] text-[var(--color-meta)] leading-relaxed">
-                    Hasilnya berupa skor kredibilitas, putusan, daftar indikator,
+                    Hasilnya berupa verdict per klaim, evidence, batasan, indikator,
                     dan tautan sumber yang dapat Anda telusuri sendiri untuk
                     memeriksa ulang.
                   </p>

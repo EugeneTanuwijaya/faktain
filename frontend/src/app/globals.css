@@ -90,12 +90,14 @@ body {
 }
 
 /* Meta text (byline, date, labels) */
-.meta-text {
-  font-family: 'Inter', 'Helvetica Neue', sans-serif;
-  font-size: 11px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--color-meta);
+@layer components {
+  .meta-text {
+    font-family: 'Inter', 'Helvetica Neue', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--color-meta);
+  }
 }
 
 /* Kicker — small section label that sits above a headline (NYT / Semafor) */

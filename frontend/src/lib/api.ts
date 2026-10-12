@@ -41,6 +41,11 @@ export async function analyzeUrl(url: string): Promise<AnalysisResult> {
   return response.data;
 }
 
+export async function analyzeImage(imageDataUrl: string, caption: string): Promise<AnalysisResult> {
+  const response = await api.post("/analyze", { image_data_url: imageDataUrl, ...(caption.trim() ? { text: caption.trim() } : {}) });
+  return response.data;
+}
+
 export async function getNewsFeed(
   limit: number = 20,
   category: string = "terkini"

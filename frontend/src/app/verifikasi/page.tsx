@@ -1,29 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import AnalysisForm from "@/components/AnalysisForm";
 import VerdictCard from "@/components/VerdictCard";
 import IndicatorList from "@/components/IndicatorList";
 import SourcesList from "@/components/SourcesList";
+import ImageContextCard from "@/components/ImageContextCard";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import { useAuth } from "@/components/AuthProvider";
-import { analyzeText, analyzeUrl } from "@/lib/api";
-import { AnalysisResult } from "@/types";
+import { analyzeImage, analyzeText, analyzeUrl } from "@/lib/api";
+import { AnalysisResult, InputType } from "@/types";
 
 export default function VerifikasiPage() {
+  return <Suspense fallback={<LoadingSkeleton />}><VerifikasiContent /></Suspense>;
+}
+
+function VerifikasiContent() {
+  const searchParams = useSearchParams();
+  const initialInputType = searchParams.get("mode") === "timpa-teks" ? "image" : "text";
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user, authConfigured, signInWithGoogle } = useAuth();
 
-  const handleSubmit = async (input: string, type: "text" | "url") => {
+  const handleSubmit = async (input: string, type: InputType, imageDataUrl?: string) => {
     setIsLoading(true);
     setError(null);
     setResult(null);
 
     try {
       const data =
-        type === "url" ? await analyzeUrl(input) : await analyzeText(input);
+        type === "image" ? await analyzeImage(imageDataUrl!, input) : type === "url" ? await analyzeUrl(input) : await analyzeText(input);
       setResult(data);
     } catch (err: unknown) {
       if (err && typeof err === "object" && "response" in err) {
@@ -70,7 +78,7 @@ export default function VerifikasiPage() {
           className="headline text-4xl md:text-5xl"
           style={{ fontFamily: "'Playfair Display', serif" }}
         >
-          Periksa Keaslian Berita
+          Cek Berita & Verifikasi Timpa Teks
         </h2>
       </div>
 
@@ -85,9 +93,8 @@ export default function VerifikasiPage() {
               <div>
                 <p className="kicker mb-1">Akses Tamu</p>
                 <p className="text-[13px] text-[var(--color-meta)] leading-relaxed">
-                  Anda bisa memverifikasi tanpa masuk, dengan kuota harian
-                  terbatas. Masuk dengan Google untuk kuota lebih tinggi dan
-                  menyimpan riwayat analisis.
+                  Anda bisa memverifikasi tanpa masuk, dengan kuota penggunaan
+                  terbatas. Masuk dengan Google untuk kuota lebih tinggi.
                 </p>
               </div>
               <button
@@ -100,12 +107,12 @@ export default function VerifikasiPage() {
             </div>
           )}
 
-          <AnalysisForm onSubmit={handleSubmit} isLoading={isLoading} />
+          <AnalysisForm key={initialInputType} initialInputType={initialInputType} onSubmit={handleSubmit} isLoading={isLoading} />
 
           {isLoading && <LoadingSkeleton />}
 
           {error && (
-            <div className="rule-top rule-bottom py-4 mb-6">
+            <div role="alert" className="rule-top rule-bottom py-4 mb-6">
               <p
                 className="meta-text mb-1"
                 style={{ color: "var(--color-accent-red)" }}
@@ -119,11 +126,9 @@ export default function VerifikasiPage() {
           {result && (
             <>
               <VerdictCard result={result} />
-              <IndicatorList indicators={result.indicators} />
-              <SourcesList
-                sources={result.sources_found}
-                claims={result.verified_claims}
-              />
+              {result.image_context && <ImageContextCard context={result.image_context} />}
+              <IndicatorList indicators={result.indicators || []} />
+              <SourcesList claims={result.claims} />
             </>
           )}
 
@@ -132,8 +137,8 @@ export default function VerifikasiPage() {
               <p className="kicker mb-2">Contoh</p>
               <p className="text-[15px] text-[var(--color-meta)] leading-relaxed">
                 Coba tempel sebuah klaim viral, kutipan pesan berantai, atau URL
-                artikel. Sistem akan menelusuri sumber tepercaya dan memberi
-                skor kredibilitas.
+                artikel, atau unggah screenshot untuk verifikasi timpa teks. Sistem akan menelusuri bukti
+                dan menjelaskan batasan hasilnya.
               </p>
             </div>
           )}
@@ -147,20 +152,20 @@ export default function VerifikasiPage() {
           <ol className="space-y-4 text-[14px] text-[var(--color-meta)]">
             <li className="rule-bottom pb-3">
               <p className="kicker mb-1">Langkah 01</p>
-              <p>Tempel teks berita atau URL artikel yang ingin diverifikasi.</p>
+              <p>Tempel teks/URL atau unggah gambar dengan caption opsional.</p>
             </li>
             <li className="rule-bottom pb-3">
               <p className="kicker mb-1">Langkah 02</p>
               <p>
-                Gemini AI menganalisis pola hoaks dan menelusuri sumber
-                verifikasi di internet.
+                AI mengekstrak klaim, membaca teks pada gambar, dan menelusuri
+                sumber evidence di internet.
               </p>
             </li>
             <li className="rule-bottom pb-3">
               <p className="kicker mb-1">Langkah 03</p>
               <p>
-                Dapatkan skor kredibilitas, indikator mencurigakan, dan sumber
-                referensi.
+                Periksa verdict per klaim, evidence mendukung/membantah, konteks
+                gambar, dan batasan pemeriksaan.
               </p>
             </li>
           </ol>

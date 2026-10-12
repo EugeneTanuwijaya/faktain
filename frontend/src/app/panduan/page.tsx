@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Panduan Cek Fakta — Faktain",
+  title: "Panduan Cek Fakta — FAKTANYA",
   description:
     "Teknik praktis mengenali hoaks dan misinformasi sebelum mempercayai atau membagikannya.",
 };
@@ -29,9 +29,9 @@ const STEPS = [
     body: "Cari klaim yang sama di media arus utama. Jika hanya satu sumber tak dikenal yang memberitakan, kredibilitasnya patut diragukan.",
   },
   {
-    label: "Verifikasi Gambar",
+    label: "Kenali Timpa Teks",
     en: "Visual",
-    body: "Foto dan video bisa diambil dari peristiwa lain. Gunakan pencarian gambar terbalik untuk memastikan asal-usulnya.",
+    body: "Tulisan pada screenshot berita, unggahan, atau kutipan bisa diganti sambil mempertahankan tampilannya. Cari judul atau kutipan di sumber asli, lalu bandingkan teksnya. Logo media bukan bukti keaslian. Timpa teks bisa berupa satire; sumber yang belum ditemukan bukan bukti bahwa gambar diedit.",
   },
   {
     label: "Kenali Bias Diri",
@@ -65,6 +65,20 @@ export default function PanduanPage() {
           mempercayai, apalagi membagikannya.
         </p>
       </div>
+
+      <section className="rule-top pt-6 mb-8" aria-labelledby="panduan-timpa-teks">
+        <h3 id="panduan-timpa-teks" className="headline text-2xl mb-3">Periksa Tulisan dan Konteksnya</h3>
+        <p className="text-[15px] leading-relaxed max-w-2xl mb-4">
+          Klaim yang keliru dan screenshot yang disunting merupakan dua hal
+          berbeda. FAKTANYA membaca teks pada gambar dan menelusuri bukti
+          pembanding. Jika bukti belum cukup, keaslian tulisan belum dapat
+          dipastikan. Untuk foto yang diduga berasal dari peristiwa lain,
+          pencarian gambar terbalik dapat membantu penelusuran manual.
+        </p>
+        <Link href="/verifikasi?mode=timpa-teks" className="pill inline-block no-underline">
+          Verifikasi Timpa Teks
+        </Link>
+      </section>
 
       <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-0">
         {/* Steps — Semafor-style structured rows */}

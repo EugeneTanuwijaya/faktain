@@ -1,6 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from datetime import datetime, timezone
+import asyncio
+import time
 
+from app.config import settings
 from app.models.response_models import NewsFeedResponse, NewsSummaryResponse
 from app.services.news_service import (
     fetch_news,
@@ -11,6 +14,7 @@ from app.services.news_service import (
 from app.services.scraper_service import scrape_article
 from app.services.gnews_decoder import decode_news_url
 from app.services.llm_service import summarize_article
+from app.services.langflow_service import LangflowTimeout, LangflowOutputError, LangflowUnavailable
 
 router = APIRouter(prefix="/news", tags=["News Feed"])
 
@@ -31,8 +35,8 @@ async def get_news(limit: int = 20, category: str = DEFAULT_CATEGORY):
     """
     try:
         articles = await fetch_news(limit=limit, category=category)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Gagal mengambil berita: {str(e)}")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Gagal mengambil berita. Coba lagi sebentar lagi.") from None
 
     return NewsFeedResponse(
         articles=articles,
@@ -48,12 +52,19 @@ async def summarize_news_article(news_id: str):
     Alur: decode URL Google News -> scrape isi artikel asli -> ringkas dengan
     LLM (tanpa grounding/web search, langsung dari teks artikel).
     """
-    news_item = await get_news_by_id(news_id)
+    deadline = time.monotonic() + settings.VERIFICATION_TIMEOUT
+    try:
+        news_item = await asyncio.wait_for(get_news_by_id(news_id), timeout=max(0, deadline - time.monotonic()))
+    except TimeoutError:
+        raise HTTPException(status_code=504, detail="Waktu ringkasan habis saat mengambil berita.") from None
     if not news_item:
         raise HTTPException(status_code=404, detail="Berita tidak ditemukan")
 
     # Decode the Google News redirect URL to the real publisher URL.
-    real_url = await decode_news_url(news_item.link)
+    try:
+        real_url = await asyncio.wait_for(decode_news_url(news_item.link), timeout=max(0, deadline - time.monotonic()))
+    except TimeoutError:
+        raise HTTPException(status_code=504, detail="Waktu ringkasan habis saat mengurai tautan berita.") from None
     if not real_url:
         raise HTTPException(
             status_code=502,
@@ -62,18 +73,26 @@ async def summarize_news_article(news_id: str):
 
     # Scrape the actual article text.
     try:
-        content = await scrape_article(real_url)
+        content = await asyncio.wait_for(scrape_article(real_url), timeout=max(0, deadline - time.monotonic()))
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
+    except TimeoutError:
+        raise HTTPException(status_code=504, detail="Waktu ringkasan habis saat mengambil artikel asli.") from None
 
     # Summarize from the scraped text (no grounding needed).
     try:
-        summary = await summarize_article(news_item.title, content)
-    except Exception as e:
+        summary = await summarize_article(news_item.title, content, timeout=max(0, deadline - time.monotonic()))
+    except (LangflowTimeout, TimeoutError):
+        raise HTTPException(status_code=504, detail="Waktu ringkasan Langflow habis; seluruh tahap berbagi satu deadline.") from None
+    except LangflowOutputError:
+        raise HTTPException(status_code=502, detail="Keluaran ringkasan Langflow tidak valid; ringkasan ditolak.") from None
+    except LangflowUnavailable:
+        raise HTTPException(status_code=503, detail="Layanan ringkasan Langflow tidak tersedia.") from None
+    except Exception:
         raise HTTPException(
             status_code=500,
-            detail=f"Gagal meringkas: {str(e)}",
-        )
+            detail="Gagal meringkas artikel. Coba lagi sebentar lagi.",
+        ) from None
 
     return NewsSummaryResponse(
         id=news_item.id,

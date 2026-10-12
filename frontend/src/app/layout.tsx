@@ -6,9 +6,9 @@ import AuthButton from "@/components/AuthButton";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Faktain — Pendeteksi Hoaks Berbasis AI",
+  title: "FAKTANYA — Cek Berita dan Verifikasi Timpa Teks",
   description:
-    "Verifikasi kredibilitas berita Indonesia secara real-time menggunakan kecerdasan buatan",
+    "Periksa klaim berita dan telusuri keaslian teks pada gambar menggunakan bukti dan sumber tepercaya.",
 };
 
 function getCurrentDate() {
@@ -45,19 +45,18 @@ export default function RootLayout({
 
           {/* Masthead */}
           <header className="text-center pt-6 pb-4">
-            <Link href="/" className="no-underline">
+            <Link href="/" className="block no-underline">
               <h1
-                className="headline text-6xl md:text-8xl tracking-tight"
+                className="headline text-5xl sm:text-6xl md:text-8xl tracking-tight"
                 style={{ fontFamily: "'Playfair Display', serif" }}
               >
-                FAKTAIN
+                FAKTANYA
               </h1>
             </Link>
             <p
-              className="meta-text mt-2"
-              style={{ fontSize: "12px", letterSpacing: "4px" }}
+              className="text-[15px] md:text-lg leading-snug -mt-1 text-[var(--color-meta)]"
             >
-              Jurnalisme Verifikasi &middot; Didukung Kecerdasan Buatan
+              Cek berita. Periksa gambar. Temukan konteksnya.
             </p>
           </header>
 
@@ -75,12 +74,12 @@ export default function RootLayout({
                   className="headline text-3xl mb-2"
                   style={{ fontFamily: "'Playfair Display', serif" }}
                 >
-                  FAKTAIN
+                  FAKTANYA
                 </h2>
                 <p className="text-[14px] text-[var(--color-meta)] leading-relaxed max-w-md">
-                  Platform verifikasi berita berbasis AI yang membantu publik
-                  Indonesia membedakan fakta dari hoaks. Dibangun dengan Gemini
-                  AI dan Google Search Grounding.
+                  Periksa klaim berita dan telusuri keaslian teks pada gambar.
+                  FAKTANYA membantu Anda menemukan bukti dan sumber sebelum
+                  mempercayai atau membagikan informasi.
                 </p>
               </div>
               <div>
@@ -93,7 +92,12 @@ export default function RootLayout({
                   </li>
                   <li>
                     <Link href="/verifikasi" className="text-[14px] no-underline hover:underline">
-                      Verifikasi Berita
+                      Cek Berita
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/verifikasi?mode=timpa-teks" className="text-[14px] no-underline hover:underline">
+                      Verifikasi Timpa Teks
                     </Link>
                   </li>
                   <li>
@@ -103,7 +107,7 @@ export default function RootLayout({
                   </li>
                   <li>
                     <Link href="/tentang" className="text-[14px] no-underline hover:underline">
-                      Tentang Kami
+                      Tentang FAKTANYA
                     </Link>
                   </li>
                 </ul>
@@ -120,7 +124,7 @@ export default function RootLayout({
             </div>
             <div className="rule-hair mt-8 pt-4 text-center">
               <p className="meta-text" style={{ fontSize: "10px" }}>
-                &copy; 2026 Faktain &middot; Verifikasi Fakta untuk Indonesia
+                &copy; 2026 FAKTANYA &middot; Verifikasi Fakta untuk Indonesia
               </p>
             </div>
           </footer>

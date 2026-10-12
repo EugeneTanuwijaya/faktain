@@ -21,10 +21,10 @@ substitutions:
   _TAG: latest
   # Firebase web config (public values, safe to keep here). Set to your project
   # to enable login in production. Leave empty to deploy in anonymous mode.
-  _FIREBASE_API_KEY: "AIzaSyAiQPEWQ5vJgP-aTBjm6k5WDm1aHEkUcaw"
-  _FIREBASE_AUTH_DOMAIN: "faktain-63ddd.firebaseapp.com"
-  _FIREBASE_PROJECT_ID: "faktain-63ddd"
-  _FIREBASE_APP_ID: "1:1032218245234:web:2ee43f2b7754c3b23a6aeb"
+  _FIREBASE_API_KEY: ""
+  _FIREBASE_AUTH_DOMAIN: ""
+  _FIREBASE_PROJECT_ID: ""
+  _FIREBASE_APP_ID: ""
 
 steps:
   # --- Backend: build + push ---
