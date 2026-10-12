@@ -37,8 +37,7 @@ def test_three_flows_use_model_handles_and_ephemeral_messages():
             assert source["output_types"][0] in target_field["input_types"]
             assert target["type"] == target_field["type"]
 
-def test_shared_review_and_root_alias_are_identical():
-    assert (ROOT / "flow.json").read_bytes() == (ROOT / "langflow/text-verification.json").read_bytes()
+def test_shared_review_is_identical():
     reviews = []
     for name in ["text-verification.json", "image-verification.json"]:
         flow = json.loads((ROOT / "langflow" / name).read_text(encoding="utf-8"))

@@ -13,7 +13,7 @@ Tidak ada agent, memory, vector database, MCP, atau tool model yang mengambil UR
 | [image-verification.json](../langflow/image-verification.json) | OCR/pengamatan visual dan klaim tanpa verdict awal, lalu pemeriksaan bukti dan pencocokan gambar |
 | [news-summary.json](../langflow/news-summary.json) | Ringkasan hanya dari isi artikel asli yang telah diambil FastAPI |
 
-[flow.json](../flow.json) merupakan alias ekspor verifikasi teks. Ekspor memakai
+Generator juga membuat alias lokal `flow.json` yang tidak disertakan di Git. Ekspor memakai
 format target 1.12.1, komponen bawaan Chat Input, Language Model dan Chat Output,
 serta komponen Faktain kecil untuk kontrak workflow/callback. Handle model bawaan
 memanggil 9Router; komponen Faktain menjalankan urutan tetap dengan validasi.
