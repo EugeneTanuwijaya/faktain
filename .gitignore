@@ -43,5 +43,31 @@ Thumbs.db
 *.swp
 
 # ===== Tooling / misc =====
+.kiro/
+.kilo/
+.vscode/
+.idea/
+AGENTS.md
+CLAUDE.md
+.next-e2e/
 .vercel
 .playwright-mcp/
+test-results/
+playwright-report/
+
+# ===== Private credentials and local runtime data =====
+*service-account*.json
+*service_account*.json
+firebase-adminsdk*.json
+credentials.json
+*.p12
+*.pfx
+*.db
+*.sqlite
+*.sqlite3
+
+# ===== Local notes and agent plans =====
+/BELAJAR.md
+/REVISION_PLAN.md
+/docs/9ROUTER_HERMES.md
+/docs/superpowers/

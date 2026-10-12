@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import SiteNav from "@/components/SiteNav";
+import { AuthProvider } from "@/components/AuthProvider";
+import AuthButton from "@/components/AuthButton";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Anti-Hoax — Pendeteksi Hoaks Berbasis AI",
+  title: "FAKTANYA — Cek Berita dan Verifikasi Timpa Teks",
   description:
-    "Verifikasi kredibilitas berita Indonesia secara real-time menggunakan kecerdasan buatan",
+    "Periksa klaim berita dan telusuri keaslian teks pada gambar menggunakan bukti dan sumber tepercaya.",
 };
 
 function getCurrentDate() {
@@ -26,56 +29,107 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body>
-        <div className="max-w-[1200px] mx-auto px-4">
+        <AuthProvider>
+          <div className="top-frame" />
+          <div className="max-w-[1200px] mx-auto px-4">
+            {/* Top utility bar */}
+            <div className="flex justify-between items-center py-2 rule-hair">
+              <span className="meta-text" style={{ fontSize: "10px" }}>
+                Edisi Digital
+              </span>
+              <span className="meta-text" style={{ fontSize: "10px" }}>
+                {getCurrentDate()}
+              </span>
+              <AuthButton />
+            </div>
+
           {/* Masthead */}
-          <header className="text-center py-6">
-            <Link href="/" className="no-underline">
+          <header className="text-center pt-6 pb-4">
+            <Link href="/" className="block no-underline">
               <h1
-                className="headline text-5xl md:text-7xl tracking-tight"
+                className="headline text-5xl sm:text-6xl md:text-8xl tracking-tight"
                 style={{ fontFamily: "'Playfair Display', serif" }}
               >
-                FAKTAIN
+                FAKTANYA
               </h1>
             </Link>
             <p
-              className="meta-text mt-1"
-              style={{ fontSize: "12px", letterSpacing: "3px" }}
+              className="text-[15px] md:text-lg leading-snug -mt-1 text-[var(--color-meta)]"
             >
-              Pendeteksi Hoaks Berbasis Kecerdasan Buatan
+              Cek berita. Periksa gambar. Temukan konteksnya.
             </p>
           </header>
 
-          {/* Date bar */}
-          <div className="rule-double flex justify-between items-center mb-4">
-            <span className="meta-text">{getCurrentDate()}</span>
-            <nav className="flex gap-6">
-              <Link
-                href="/"
-                className="meta-text no-underline hover:text-[var(--color-ink)] transition-colors"
-              >
-                Beranda
-              </Link>
-              <Link
-                href="/news"
-                className="meta-text no-underline hover:text-[var(--color-ink)] transition-colors"
-              >
-                Berita Terkini
-              </Link>
-            </nav>
-            <span className="meta-text">Jakarta, Indonesia</span>
-          </div>
+          {/* Section navigation */}
+          <SiteNav />
 
           {/* Main content */}
-          <main>{children}</main>
+          <main className="mt-6">{children}</main>
 
           {/* Footer */}
-          <footer className="rule-top mt-12 py-6 text-center">
-            <p className="meta-text">
-              &copy; 2025 Anti-Hoax &middot; Didukung oleh Gemini AI &middot;
-              Verifikasi fakta untuk Indonesia
-            </p>
+          <footer className="rule-top mt-16 pt-8 pb-10">
+            <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-8">
+              <div>
+                <h2
+                  className="headline text-3xl mb-2"
+                  style={{ fontFamily: "'Playfair Display', serif" }}
+                >
+                  FAKTANYA
+                </h2>
+                <p className="text-[14px] text-[var(--color-meta)] leading-relaxed max-w-md">
+                  Periksa klaim berita dan telusuri keaslian teks pada gambar.
+                  FAKTANYA membantu Anda menemukan bukti dan sumber sebelum
+                  mempercayai atau membagikan informasi.
+                </p>
+              </div>
+              <div>
+                <p className="section-label mb-3">Bagian</p>
+                <ul className="space-y-2">
+                  <li>
+                    <Link href="/news" className="text-[14px] no-underline hover:underline">
+                      Berita Terkini
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/verifikasi" className="text-[14px] no-underline hover:underline">
+                      Cek Berita
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/verifikasi?mode=timpa-teks" className="text-[14px] no-underline hover:underline">
+                      Verifikasi Timpa Teks
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/panduan" className="text-[14px] no-underline hover:underline">
+                      Panduan Cek Fakta
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/tentang" className="text-[14px] no-underline hover:underline">
+                      Tentang FAKTANYA
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <p className="section-label mb-3">Sumber Tepercaya</p>
+                <ul className="space-y-2 text-[14px] text-[var(--color-meta)]">
+                  <li>Kompas</li>
+                  <li>Tempo</li>
+                  <li>Turnbackhoax.id</li>
+                  <li>Google News Indonesia</li>
+                </ul>
+              </div>
+            </div>
+            <div className="rule-hair mt-8 pt-4 text-center">
+              <p className="meta-text" style={{ fontSize: "10px" }}>
+                &copy; 2026 FAKTANYA &middot; Verifikasi Fakta untuk Indonesia
+              </p>
+            </div>
           </footer>
-        </div>
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );

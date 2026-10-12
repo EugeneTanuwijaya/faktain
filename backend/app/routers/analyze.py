@@ -1,48 +1,78 @@
-from fastapi import APIRouter, HTTPException
+import logging
+import asyncio
+import time
+from typing import Optional
+
+from fastapi import APIRouter, Depends, HTTPException
+
+from app.dependencies import enforce_analyze_rate_limit
 from app.models.request_models import AnalyzeRequest
-from app.models.response_models import AnalysisResponse
-from app.services.gemini_service import analyze_text
+from app.config import settings
+from app.models.verification_models import VerificationResponse
+from app.services.auth_service import AuthUser
+from app.services.verification_service import verify_content
+from app.services.image_service import normalize_image
+from app.services.evidence_service import normalize_result
 from app.services.scraper_service import scrape_article
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/analyze", tags=["Analisis"])
 
 
-@router.post("", response_model=AnalysisResponse)
-async def analyze_content(request: AnalyzeRequest):
+@router.post("", response_model=VerificationResponse)
+async def analyze_content(
+    request: AnalyzeRequest,
+    user: Optional[AuthUser] = Depends(enforce_analyze_rate_limit),
+):
     """
-    Analisis teks berita atau URL artikel untuk mendeteksi hoaks.
-    Kirim salah satu: `text` (teks mentah) atau `url` (URL artikel).
-    """
-    if not request.text and not request.url:
-        raise HTTPException(
-            status_code=400,
-            detail="Harus menyertakan 'text' atau 'url' untuk dianalisis",
-        )
+    Verifikasi evidence dari teks, URL atau gambar dengan caption opsional.
 
-    # Get text content
-    content = request.text
+    Verifikasi terbuka untuk umum. Pengunjung anonim dibatasi per IP;
+    pengguna yang masuk (Firebase ID token via header Authorization) mendapat
+    kuota lebih tinggi.
+    """
+    deadline = time.monotonic() + settings.VERIFICATION_TIMEOUT
+    content = request.text or ""
+    image = None
+    input_type = "image" if request.image_data_url else "url" if request.url else "text"
+    if request.image_data_url:
+        try:
+            image = await asyncio.wait_for(asyncio.to_thread(normalize_image, request.image_data_url),
+                                           timeout=max(0, deadline - time.monotonic()))
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc))
+        except TimeoutError:
+            raise HTTPException(status_code=422, detail="Waktu verifikasi habis saat menyiapkan gambar.") from None
     if request.url:
         try:
-            content = await scrape_article(request.url)
+            content = await asyncio.wait_for(scrape_article(request.url),
+                                             timeout=min(15.0, max(0, deadline - time.monotonic())))
         except ValueError as e:
             raise HTTPException(status_code=422, detail=str(e))
+        except TimeoutError:
+            raise HTTPException(status_code=422, detail="Pengambilan artikel terlalu lama. Coba tempel teksnya.")
 
-    if not content or len(content.strip()) < 20:
+    if not image and len(content.strip()) < 20:
         raise HTTPException(
             status_code=400,
             detail="Teks terlalu pendek untuk dianalisis (minimal 20 karakter)",
         )
 
-    # Analyze with Gemini
+    # Exception messages and tracebacks may include provider or input payloads.
     try:
-        result = await analyze_text(content)
-    except Exception as e:
+        result = await verify_content(content, image_data_url=image, input_type=input_type,
+                                      timeout=max(0, deadline - time.monotonic()))
+    except TimeoutError:
+        result = normalize_result({}, [], [], observation={} if image else None, input_type=input_type, orchestration="langflow",
+                                  limitations=["Waktu verifikasi habis; pengambilan dan perbandingan evidence belum selesai. Silakan ulangi."])
+    except Exception as exc:
+        logger.warning("Analisis gagal (%s)", type(exc).__name__)
         raise HTTPException(
             status_code=500,
-            detail=f"Gagal menganalisis: {str(e)}",
+            detail="Gagal menganalisis. Coba lagi sebentar lagi.",
         )
 
     # Add snippet of analyzed text
-    result["analyzed_text"] = content[:200] + "..." if len(content) > 200 else content
-
-    return AnalysisResponse(**result)
+    result.analyzed_text = content[:300]
+    return result

@@ -1,104 +1,31 @@
 "use client";
 
-import { Source, VerifiedClaim } from "@/types";
+import { ClaimResult, Evidence } from "@/types";
+import { VerdictBadge } from "@/components/VerdictCard";
 
-interface SourcesListProps {
-  sources: Source[];
-  claims: VerifiedClaim[];
+export function EvidenceList({ evidence }: { evidence: Evidence[] }) {
+  return <ul className="space-y-3">{evidence.map((item, i) => <li key={`${item.source_id}-${i}`} className="border-l-2 border-[var(--color-rule-light)] pl-3">
+    <blockquote className="text-[14px] leading-relaxed whitespace-pre-wrap">&ldquo;{item.excerpt}&rdquo;</blockquote>
+    <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-[13px] underline break-words">{item.title}</a>
+    <p className="text-[11px] text-[var(--color-meta)] break-all mt-1">{item.url}</p>
+  </li>)}</ul>;
 }
 
-export default function SourcesList({ sources, claims }: SourcesListProps) {
-  const getClaimStatusStyle = (status: string) => {
-    switch (status) {
-      case "TERKONFIRMASI":
-        return { color: "var(--color-accent-green)", label: "✓ TERKONFIRMASI" };
-      case "DIBANTAH":
-        return { color: "var(--color-accent-red)", label: "✗ DIBANTAH" };
-      default:
-        return { color: "var(--color-accent-yellow)", label: "? BELUM TERVERIFIKASI" };
-    }
-  };
-
-  const getCredibilityStyle = (credibility: string) => {
-    switch (credibility) {
-      case "TERPERCAYA":
-        return "var(--color-accent-green)";
-      case "MERAGUKAN":
-        return "var(--color-accent-red)";
-      default:
-        return "var(--color-meta)";
-    }
-  };
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Verified Claims */}
-      {claims && claims.length > 0 && (
-        <div>
-          <h3
-            className="headline text-xl mb-3 rule-bottom pb-2"
-            style={{ fontFamily: "'Playfair Display', serif" }}
-          >
-            Verifikasi Klaim
-          </h3>
-          <div className="space-y-3">
-            {claims.map((claim, index) => {
-              const style = getClaimStatusStyle(claim.status);
-              return (
-                <div key={index} className="rule-bottom pb-3">
-                  <p className="text-[14px] font-bold mb-1">
-                    &ldquo;{claim.claim}&rdquo;
-                  </p>
-                  <span
-                    className="meta-text"
-                    style={{ color: style.color, fontSize: "10px" }}
-                  >
-                    {style.label}
-                  </span>
-                  <p className="text-[13px] text-[var(--color-meta)] mt-1">
-                    {claim.explanation}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Sources Found */}
-      {sources && sources.length > 0 && (
-        <div className="md:rule-left md:pl-6">
-          <h3
-            className="headline text-xl mb-3 rule-bottom pb-2"
-            style={{ fontFamily: "'Playfair Display', serif" }}
-          >
-            Sumber Ditemukan
-          </h3>
-          <div className="space-y-2">
-            {sources.map((source, index) => (
-              <div key={index} className="rule-bottom pb-2">
-                <a
-                  href={source.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[14px] text-[var(--color-ink)] underline hover:no-underline"
-                >
-                  {source.title}
-                </a>
-                <span
-                  className="meta-text ml-2"
-                  style={{
-                    color: getCredibilityStyle(source.credibility),
-                    fontSize: "10px",
-                  }}
-                >
-                  {source.credibility}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+export default function SourcesList({ claims }: { claims: ClaimResult[] }) {
+  return <section aria-label="Verifikasi klaim">
+    <h3 className="headline text-xl mb-4 rule-bottom pb-2">Klaim dan Evidence</h3>
+    {!claims.length && <p className="text-[14px]">Belum ada klaim yang dapat diperiksa. Tambahkan caption atau teks yang lebih jelas.</p>}
+    <div className="space-y-6">{claims.map((claim, i) => <article key={i} className="rule-bottom pb-6">
+      <h4 className="headline text-lg mb-2">{i + 1}. {claim.claim}</h4>
+      <VerdictBadge verdict={claim.verdict} />
+      <p className="text-[14px] mt-3 mb-4">{claim.reasoning}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div><h5 className="section-label mb-2">Evidence Mendukung</h5>
+          {claim.supporting_evidence.length ? <EvidenceList evidence={claim.supporting_evidence} /> : <p className="text-[13px] text-[var(--color-meta)]">Belum ada evidence pendukung yang diterima.</p>}</div>
+        <div><h5 className="section-label mb-2">Evidence Membantah</h5>
+          {claim.contradicting_evidence.length ? <EvidenceList evidence={claim.contradicting_evidence} /> : <p className="text-[13px] text-[var(--color-meta)]">Belum ada evidence pembantah yang diterima.</p>}</div>
+      </div>
+      {!!claim.limitations.length && <ul className="list-disc pl-5 mt-4 text-[13px] text-[var(--color-meta)] space-y-1">{claim.limitations.map((limit, j) => <li key={j}>{limit}</li>)}</ul>}
+    </article>)}</div>
+  </section>;
 }

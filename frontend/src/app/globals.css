@@ -1,16 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @import "tailwindcss";
 
 :root {
   --color-paper: #f4f4f0;
+  --color-paper-alt: #efeee7;
   --color-ink: #1a1a1a;
   --color-meta: #555555;
   --color-rule: #111111;
   --color-rule-light: #d1d1d1;
+  --color-highlight: #ebe9e0;
   --color-accent-red: #8b0000;
   --color-accent-green: #1a5c1a;
   --color-accent-yellow: #8b6914;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
@@ -20,7 +26,9 @@ body {
   line-height: 1.6;
 }
 
-/* Newspaper Rules (dividers) */
+/* ----------------------------------------------------------------------------
+   Newspaper Rules (dividers)
+---------------------------------------------------------------------------- */
 .rule-top {
   border-top: 2px solid var(--color-rule);
 }
@@ -40,7 +48,33 @@ body {
 .rule-double {
   border-top: 2px solid var(--color-rule);
   border-bottom: 1px solid var(--color-rule);
-  padding: 4px 0;
+}
+
+.rule-hair {
+  border-bottom: 1px solid var(--color-rule-light);
+}
+
+/* Thin accent bar at the very top of the page (NYT-style frame) */
+.top-frame {
+  border-top: 3px solid var(--color-rule);
+}
+
+/* ----------------------------------------------------------------------------
+   Typography
+---------------------------------------------------------------------------- */
+.headline {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* Oversized lead headline for hero / front-page stories */
+.lead-headline {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
 }
 
 /* Drop Cap */
@@ -55,24 +89,150 @@ body {
   color: var(--color-ink);
 }
 
-/* Headline styles */
-.headline {
-  font-family: 'Playfair Display', serif;
-  font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+/* Meta text (byline, date, labels) */
+@layer components {
+  .meta-text {
+    font-family: 'Inter', 'Helvetica Neue', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--color-meta);
+  }
 }
 
-/* Meta text (byline, date, labels) */
-.meta-text {
+/* Kicker — small section label that sits above a headline (NYT / Semafor) */
+.kicker {
   font-family: 'Inter', 'Helvetica Neue', sans-serif;
   font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-accent-red);
+}
+
+/* Section label — used as a heading with a tiny leading marker */
+.section-label {
+  font-family: 'Inter', 'Helvetica Neue', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-label::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background-color: var(--color-accent-red);
+}
+
+/* Body copy helpers */
+.body-serif {
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+.justify-text {
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* ----------------------------------------------------------------------------
+   Section navigation (NYT-style)
+---------------------------------------------------------------------------- */
+.nav-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.nav-bar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .nav-bar {
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow-x: visible;
+  }
+}
+
+.nav-link {
+  font-family: 'Inter', 'Helvetica Neue', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--color-meta);
+  text-decoration: none;
+  padding: 10px 18px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, background-color 0.15s ease,
+    border-color 0.15s ease;
+  white-space: nowrap;
 }
 
-/* Verdict badges */
+.nav-link:hover {
+  color: var(--color-ink);
+  background-color: var(--color-highlight);
+}
+
+.nav-link--active {
+  color: var(--color-ink);
+  font-weight: 700;
+  border-bottom-color: var(--color-accent-red);
+}
+
+/* ----------------------------------------------------------------------------
+   Semafor-style structured breakdown ("Semaform")
+---------------------------------------------------------------------------- */
+.semaform-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  padding: 16px 0;
+  border-top: 1px solid var(--color-rule-light);
+}
+
+@media (min-width: 768px) {
+  .semaform-row {
+    grid-template-columns: 140px 1fr;
+    gap: 20px;
+  }
+}
+
+.semaform-label {
+  font-family: 'Inter', 'Helvetica Neue', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  padding-top: 2px;
+}
+
+.semaform-label span {
+  display: block;
+  color: var(--color-accent-red);
+  font-size: 10px;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+/* ----------------------------------------------------------------------------
+   Verdict badges
+---------------------------------------------------------------------------- */
 .badge-kredibel {
   background-color: var(--color-accent-green);
   color: #ffffff;
@@ -88,7 +248,94 @@ body {
   color: #ffffff;
 }
 
-/* Loading skeleton */
+/* ----------------------------------------------------------------------------
+   Section tabs (NYT subsection nav)
+---------------------------------------------------------------------------- */
+.cat-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0;
+  padding-bottom: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cat-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .cat-tabs {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
+
+.cat-tab {
+  font-family: 'Inter', 'Helvetica Neue', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: var(--color-meta);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 6px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.cat-tab:first-child {
+  padding-left: 0;
+}
+
+.cat-tab:not(:last-child) {
+  border-right: 1px solid var(--color-rule-light);
+}
+
+.cat-tab:hover {
+  color: var(--color-ink);
+}
+
+.cat-tab--active {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+.cat-tab:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ----------------------------------------------------------------------------
+   Buttons / pills
+---------------------------------------------------------------------------- */
+.pill {
+  font-family: 'Inter', 'Helvetica Neue', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border: 1px solid var(--color-rule);
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pill:hover {
+  background-color: var(--color-ink);
+  color: #fff;
+}
+
+/* ----------------------------------------------------------------------------
+   Loading skeleton
+---------------------------------------------------------------------------- */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -100,7 +347,9 @@ body {
   animation: shimmer 1.5s infinite;
 }
 
-/* Scrollbar styling */
+/* ----------------------------------------------------------------------------
+   Scrollbar
+---------------------------------------------------------------------------- */
 ::-webkit-scrollbar {
   width: 8px;
 }

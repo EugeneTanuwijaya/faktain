@@ -1,59 +1,140 @@
+# CI/CD pipeline for the Anti-Hoax app (FastAPI backend + Next.js frontend).
+#
+# Flow:
+#   1. Build, push, and deploy the backend.
+#   2. Read the backend's public URL, then build the frontend with that URL
+#      baked in (NEXT_PUBLIC_API_URL is inlined at build time).
+#   3. Deploy the frontend, then patch the backend's FRONTEND_URL env var so
+#      CORS allows the real frontend origin.
+#
+# Required substitution (set in the trigger or via --substitutions):
+#   _REGION        deployment region (default below)
+#   _REPO          Artifact Registry repo name (default below)
+# Secret "llm-api-key" must exist in Secret Manager (see infra notes below).
+
+substitutions:
+  _REGION: asia-southeast1
+  _REPO: hoax-detector
+  # Image tag. Manual `gcloud builds submit` leaves COMMIT_SHA empty, so we
+  # default to "latest"; a GitHub trigger can override with
+  # --substitutions _TAG=$COMMIT_SHA for immutable, per-commit tags.
+  _TAG: latest
+  # Firebase web config (public values, safe to keep here). Set to your project
+  # to enable login in production. Leave empty to deploy in anonymous mode.
+  _FIREBASE_API_KEY: ""
+  _FIREBASE_AUTH_DOMAIN: ""
+  _FIREBASE_PROJECT_ID: ""
+  _FIREBASE_APP_ID: ""
+
 steps:
-  # --- Backend ---
+  # --- Backend: build + push ---
   - name: "gcr.io/cloud-builders/docker"
+    id: "build-backend"
     args:
       - build
       - -t
-      - asia-southeast1-docker.pkg.dev/$PROJECT_ID/hoax-detector/backend:$COMMIT_SHA
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/backend:${_TAG}
       - ./backend
-    id: "build-backend"
 
   - name: "gcr.io/cloud-builders/docker"
-    args:
-      - push
-      - asia-southeast1-docker.pkg.dev/$PROJECT_ID/hoax-detector/backend:$COMMIT_SHA
     id: "push-backend"
     waitFor: ["build-backend"]
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/backend:${_TAG}
 
+  # --- Backend: deploy ---
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    id: "deploy-backend"
+    waitFor: ["push-backend"]
     entrypoint: gcloud
     args:
       - run
       - deploy
       - hoax-detector-backend
-      - --image=asia-southeast1-docker.pkg.dev/$PROJECT_ID/hoax-detector/backend:$COMMIT_SHA
-      - --region=asia-southeast1
+      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/backend:${_TAG}
+      - --region=${_REGION}
+      - --platform=managed
       - --allow-unauthenticated
-    id: "deploy-backend"
-    waitFor: ["push-backend"]
+      # Rate limiter + news cache live in process memory; keep a single
+      # instance so they actually apply. Raise only after moving that state
+      # to a shared store (Firestore/Redis).
+      - --max-instances=1
+      - --set-env-vars=GCP_PROJECT_ID=$PROJECT_ID,FIREBASE_PROJECT_ID=${_FIREBASE_PROJECT_ID}
+      - --set-secrets=LLM_API_KEY=llm-api-key:latest
 
-  # --- Frontend ---
-  - name: "gcr.io/cloud-builders/docker"
+  # --- Get backend URL into the shared /workspace (docker builder has no gcloud) ---
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    id: "get-backend-url"
+    waitFor: ["deploy-backend"]
+    entrypoint: bash
     args:
-      - build
-      - -t
-      - asia-southeast1-docker.pkg.dev/$PROJECT_ID/hoax-detector/frontend:$COMMIT_SHA
-      - ./frontend
+      - -c
+      - |
+        set -e
+        gcloud run services describe hoax-detector-backend \
+          --region=${_REGION} --format='value(status.url)' > /workspace/backend_url.txt
+        echo "Backend URL: $(cat /workspace/backend_url.txt)"
+
+  # --- Frontend: build with the backend URL baked in, push ---
+  - name: "gcr.io/cloud-builders/docker"
     id: "build-frontend"
+    waitFor: ["get-backend-url"]
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -e
+        BACKEND_URL=$(cat /workspace/backend_url.txt)
+        docker build \
+          --build-arg NEXT_PUBLIC_API_URL=$$BACKEND_URL \
+          --build-arg NEXT_PUBLIC_FIREBASE_API_KEY=${_FIREBASE_API_KEY} \
+          --build-arg NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${_FIREBASE_AUTH_DOMAIN} \
+          --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID=${_FIREBASE_PROJECT_ID} \
+          --build-arg NEXT_PUBLIC_FIREBASE_APP_ID=${_FIREBASE_APP_ID} \
+          -t ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/frontend:${_TAG} \
+          ./frontend
 
   - name: "gcr.io/cloud-builders/docker"
-    args:
-      - push
-      - asia-southeast1-docker.pkg.dev/$PROJECT_ID/hoax-detector/frontend:$COMMIT_SHA
     id: "push-frontend"
     waitFor: ["build-frontend"]
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/frontend:${_TAG}
 
+  # --- Frontend: deploy ---
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    id: "deploy-frontend"
+    waitFor: ["push-frontend"]
     entrypoint: gcloud
     args:
       - run
       - deploy
       - hoax-detector-frontend
-      - --image=asia-southeast1-docker.pkg.dev/$PROJECT_ID/hoax-detector/frontend:$COMMIT_SHA
-      - --region=asia-southeast1
+      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/frontend:${_TAG}
+      - --region=${_REGION}
+      - --platform=managed
       - --allow-unauthenticated
-    id: "deploy-frontend"
-    waitFor: ["push-frontend"]
+
+  # --- Patch backend CORS with the real frontend origin ---
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    id: "patch-backend-cors"
+    waitFor: ["deploy-frontend"]
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -e
+        FRONTEND_URL=$(gcloud run services describe hoax-detector-frontend \
+          --region=${_REGION} --format='value(status.url)')
+        echo "Frontend URL: $$FRONTEND_URL"
+        gcloud run services update hoax-detector-backend \
+          --region=${_REGION} \
+          --update-env-vars=FRONTEND_URL=$$FRONTEND_URL
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/backend:${_TAG}
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/frontend:${_TAG}
 
 options:
   logging: CLOUD_LOGGING_ONLY
