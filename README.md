@@ -45,7 +45,6 @@ Next.js -> FastAPI -> Langflow -> 9Router (model teks/vision)
 backend/       API, validasi, pencarian bukti, dan tes Python
 frontend/      Antarmuka Next.js dan tes browser
 langflow/      Komponen workflow dan ekspor tiga flow
-flow.json      Ekspor flow verifikasi teks
 infra/         Template deployment Cloud Build
 docs/         Panduan Langflow, demo, login, dan catatan validasi
 ```

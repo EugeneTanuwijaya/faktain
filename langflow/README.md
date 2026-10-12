@@ -1,7 +1,7 @@
 # Faktain flows (Langflow 1.12.1)
 
 Import `text-verification.json`, `image-verification.json` and `news-summary.json`.
-The root `flow.json` is an identical text verification export.
+The generator also writes a local `flow.json` alias, which is excluded from Git.
 
 Configure every custom component's Backend URL and Service Key using the same
 private callback configuration as FastAPI. Configure the built-in Language Model
